@@ -34,16 +34,23 @@ app.get('/search/:name', function(req, res) {
 
     searchReq.on('end', function(item) {
         var artist = item.artists.items[0];
-        res.json(artist);
+        unirest.get('https://api.spotify.com/v1/artists/' + artist.id + '/related-artists')
+               .end(function(response){
+                    console.log(response.ok)
+                    if (response.ok){
+                        artist.related = response.body.artists;
+                        res.json(artist);
+                    } else {
+                        res.sendStatus(404);
+                    };
+               });
+
         //console.log(item.artists.items[0].id)
     });
-
 
     searchReq.on('error', function(code) {
         res.sendStatus(code);
     });
 });
-
-app.get()
 
 app.listen(process.env.PORT || 8080);
