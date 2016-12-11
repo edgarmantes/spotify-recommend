@@ -39,24 +39,47 @@ app.get('/search/:name', function(req, res) {
                     if (response.ok){
                         artist.related = response.body.artists;
                         //res.json(artist);
-                        
+
+                        var allTracks = artist.related.length;
+                        var completed = 0;
+
+                        var allArtists = function() {
+                            if (completed === allTracks) {
+                                res.json(artist);
+                            }
+                        };
+
+                        artist.related.forEach(function(artist){
+                            unirest.get('https://api.spotify.com/v1/artists/' + artist.id + "/top-tracks?country=SE")
+                                    .end(function(response){
+                                        if (response.ok){
+                                            artist.tracks = response.body.tracks;
+                                            completed += 1;
+                                            allArtists();
+                                        } else {
+                                            console.log('error with top-tracks')
+                                        }
+                                    });
+                        });
+                        // res.json(artist)
+
                     } else {
                         res.sendStatus(404);
                     };
                });
 
-        artist.related.forEach(function(eachArtist){
-            console.log(eachArtist)
-            unirest.get('https://api.spotify.com/v1/artists/' + eachArtist.id + "/top-tracks")
-                    .end(function(response){
-                        if (response.ok){
-                            eachArtist.tracks = response.body.tracks;
-                            res.json(artist)
-                        } else{
-                            res.sendStatus(404);
-                        }
-                    });
-        })
+        // artist.related.forEach(function(eachArtist){
+        //     console.log(eachArtist)
+        //     unirest.get('https://api.spotify.com/v1/artists/' + eachArtist.id + "/top-tracks")
+        //             .end(function(response){
+        //                 if (response.ok){
+        //                     eachArtist.tracks = response.body.tracks;
+        //                     res.json(artist)
+        //                 } else{
+        //                     res.sendStatus(404);
+        //                 }
+        //             });
+        // })
 
     });
 
