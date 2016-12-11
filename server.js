@@ -36,16 +36,28 @@ app.get('/search/:name', function(req, res) {
         var artist = item.artists.items[0];
         unirest.get('https://api.spotify.com/v1/artists/' + artist.id + '/related-artists')
                .end(function(response){
-                    console.log(response.ok)
                     if (response.ok){
                         artist.related = response.body.artists;
-                        res.json(artist);
+                        //res.json(artist);
+                        
                     } else {
                         res.sendStatus(404);
                     };
                });
 
-        //console.log(item.artists.items[0].id)
+        artist.related.forEach(function(eachArtist){
+            console.log(eachArtist)
+            unirest.get('https://api.spotify.com/v1/artists/' + eachArtist.id + "/top-tracks")
+                    .end(function(response){
+                        if (response.ok){
+                            eachArtist.tracks = response.body.tracks;
+                            res.json(artist)
+                        } else{
+                            res.sendStatus(404);
+                        }
+                    });
+        })
+
     });
 
     searchReq.on('error', function(code) {
