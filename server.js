@@ -38,7 +38,6 @@ app.get('/search/:name', function(req, res) {
                .end(function(response){
                     if (response.ok){
                         artist.related = response.body.artists;
-                        //res.json(artist);
 
                         var allTracks = artist.related.length;
                         var completed = 0;
@@ -61,25 +60,11 @@ app.get('/search/:name', function(req, res) {
                                         }
                                     });
                         });
-                        // res.json(artist)
 
                     } else {
                         res.sendStatus(404);
                     };
                });
-
-        // artist.related.forEach(function(eachArtist){
-        //     console.log(eachArtist)
-        //     unirest.get('https://api.spotify.com/v1/artists/' + eachArtist.id + "/top-tracks")
-        //             .end(function(response){
-        //                 if (response.ok){
-        //                     eachArtist.tracks = response.body.tracks;
-        //                     res.json(artist)
-        //                 } else{
-        //                     res.sendStatus(404);
-        //                 }
-        //             });
-        // })
 
     });
 
